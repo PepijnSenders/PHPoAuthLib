@@ -93,11 +93,16 @@ abstract class AbstractService extends BaseAbstractService implements ServiceInt
             'grant_type'    => 'authorization_code',
         );
 
-        $responseBody = $this->httpClient->retrieveResponse(
-            $this->getAccessTokenEndpoint(),
-            $bodyParams,
-            $this->getExtraOAuthHeaders()
-        );
+        try {
+            $responseBody = $this->httpClient->retrieveResponse(
+                $this->getAccessTokenEndpoint(),
+                $bodyParams,
+                $this->getExtraOAuthHeaders()
+            );
+        }
+        catch (TokenResponseException $e) {
+            return false;
+        }
         $token = $this->parseAccessTokenResponse($responseBody);
         $this->storage->storeAccessToken($this->service(), $token);
 
